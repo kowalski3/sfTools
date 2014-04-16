@@ -94,7 +94,7 @@ public class XPathTest {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		new XPathTest().traverseFolders(args[0]);
+		new XPathTest().traverseFolders("C:\\Users\\Julian.SUNFLYKARAOKE\\Desktop\\TEST");
 	}
 }
 
