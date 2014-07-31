@@ -25,14 +25,14 @@ public class FileWriter{
 		}
 	}
 	
-	public static void writeToFile(Map<Integer, String> listToWrite){
+	public static void writeToFile(Map<String, String> listToWrite){
 		File file = new File("output.txt");
 		PrintWriter out = null;
 		
 		try {
 			out = new PrintWriter(file);
 			
-			for(Map.Entry<Integer, String>  entry : listToWrite.entrySet()){
+			for(Map.Entry<String, String>  entry : listToWrite.entrySet()){
 				out.write(entry.getValue());
 				out.write(System.getProperty("line.separator"));
 			}
