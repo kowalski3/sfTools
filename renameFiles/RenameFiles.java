@@ -11,6 +11,27 @@ public class RenameFiles{
 		return newFileName += oldFileName.substring(oldFileName.indexOf(" "), oldFileName.length());
 	}
 	
+	public void renameAllFiles(String directoryName) {
+		File directory = new File(directoryName);
+		// get all the files from a directory
+		File[] fList = directory.listFiles();
+		
+		for (File file : fList) {
+			if (file.isFile()) {
+				
+				File newFile = new File(getNewFileName(file.getName()));
+				
+				System.out.println(file.renameTo(newFile));
+				
+				
+		
+			} else if (file.isDirectory()) {
+				renameAllFiles(file.getPath());
+			}
+		}
+	}
+	
+	
 
 	public void showFileNameChanges(String directoryName) {
 		File directory = new File(directoryName);
@@ -38,11 +59,15 @@ public class RenameFiles{
 		// get all the files from a directory
 		File[] fList = directory.listFiles();
 	
-		showFileNameChanges(directoryName);
+		//showFileNameChanges(directoryName);
+		renameAllFiles(directoryName);
 	}
 	
 	
 	public static void main(String[] args){
-		new RenameFiles().launch("C:\\Users\\Julian.SUNFLYKARAOKE\\Desktop\\TESTFOLDER");
+		//try{
+			new RenameFiles().launch("C:\\Users\\Julian.SUNFLYKARAOKE\\Desktop\\TESTFOLDER");
+		//} catch (StringIndexOutOfBoundsException ex){
+		//}
 	}
 }
