@@ -3,40 +3,25 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 
 public class ProductCreator{
 	
 	private Map<String, Map<String, String>> compilationToProductsMap= new HashMap<String, Map<String, String>>();
 	private File productData = new File("productData.csv");
 	
+	File sourceDirectory = new File("C:\\Users\\Julian.SUNFLYKARAOKE\\Desktop\\source");
+	// get all the files from a directory
+	File[] fList = sourceDirectory.listFiles();
+	
+	String targetDirectory = "C:\\Users\\Julian.SUNFLYKARAOKE\\Desktop\\output\\";
 	
 	
-	public void addToProductMap(String line){
-		String[] dataRow = line.split(",");
-		if(compilationToProductsMap.get(dataRow[0]) == null){		
-			compilationToProductsMap.put(dataRow[0], new HashMap<String,String>());
-		}
-		
-		compilationToProductsMap.get(dataRow[0]).put(dataRow[1], dataRow[2]);
-		
-	}
 	
-	
-	public void findFile(String filePrefix) {
-		File directory = new File("C:\\Users\\Julian.SUNFLYKARAOKE\\Desktop\\TESTFOLDER");
-		// get all the files from a directory
-		File[] fList = directory.listFiles();
-		
-		for (File file : fList) {
-			if (file.isFile()) {
-				if(file.getName().contains(filePrefix)) System.out.println(file.getName());
-			} else if (file.isDirectory()) {
-				findFile(file.getPath());
-			}
-		}
-	}
-	
-	
+	//CREATE PRODUCT MAP FROM CSV DATA
 	public void createProductMap(){
 			BufferedReader in = null;
 			try{	
@@ -64,17 +49,74 @@ public class ProductCreator{
 		}
 	}
 	
-	public void getCompilationData(String product){
+	public void addToProductMap(String line){
+		String[] dataRow = line.split(",");
+		if(compilationToProductsMap.get(dataRow[0]) == null){		
+			compilationToProductsMap.put(dataRow[0], new HashMap<String,String>());
+		}
+		
+		compilationToProductsMap.get(dataRow[0]).put(dataRow[1], dataRow[2]);
+		
+	}
+	
+	
+	
+	//FIND AND COPY FILES
+	public void findAndCopyFiles(String product){
 		Map<String, String> tempMap = compilationToProductsMap.get(product);
 	
-		for(Map.Entry<String, String> entry : tempMap.entrySet()){
-			findFile(entry.getKey());
-			//System.out.printf("Key : %s and Value: %s %n", entry.getKey(), entry.getValue());
+		try{
+			for(Map.Entry<String, String> entry : tempMap.entrySet()){
+				File foundFile = findFile(entry.getKey());
+				copyFile(foundFile.getPath());
+				//System.out.printf("Key : %s and Value: %s %n", entry.getKey(), entry.getValue());
+				
+			}
+		} catch(NullPointerException ex){
+			System.out.println();
+			System.out.println("Error, can't find " + product);
+		} catch(IOException ex){
+			System.out.println(ex);
 		}
 
 	}
 	
+	public File findFile(String filePrefix) {
+		File foundFile = null;
+		for (File file : fList) {
+			if (file.isFile()) {
+				if(file.getName().contains("SF" + filePrefix)){
+						foundFile = file;
+						break;
+					}
+			} else if (file.isDirectory()) {
+				findFile(file.getPath());
+			}	
+		}
+		return foundFile;
+}
 	
+	public void copyFile(String sourceFileLocation) throws IOException {
+		File sourceFile = new File(sourceFileLocation);
+		File destinationFile = new File(targetDirectory + sourceFile.getName());
+		try {
+			FileInputStream fileInputStream = new FileInputStream(sourceFile);
+			FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
+			int bufferSize;
+			byte[] bufffer = new byte[512];
+			while ((bufferSize = fileInputStream.read(bufffer)) > 0) {
+				fileOutputStream.write(bufffer, 0, bufferSize);
+			}
+				fileInputStream.close();
+				fileOutputStream.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+		}
+	}
+	
+	
+	
+	//IS INTEGER METHOD
 	public static boolean isInteger(String s) {
 		try { 
 			Integer.parseInt(s); 
@@ -84,14 +126,16 @@ public class ProductCreator{
 		return true;
 	}
 	
+	
+	
+	//LAUNCH 
 	private void launch(String product){
+		
 		createProductMap();
-		getCompilationData(product);
+		findAndCopyFiles(product);
 	}
 	
 	public static void main(String[] args){
-
 			new ProductCreator().launch(args[0]);
-		
 	}
 }
