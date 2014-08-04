@@ -115,18 +115,6 @@ public class ProductCreator{
 	
 	
 	
-	//IS INTEGER METHOD
-	public static boolean isInteger(String s) {
-		try { 
-			Integer.parseInt(s); 
-		} catch(NumberFormatException e) { 
-			return false; 
-		}
-		return true;
-	}
-	
-	
-	
 	//LAUNCH 
 	private void launch(String product){
 		
