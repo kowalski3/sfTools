@@ -28,7 +28,12 @@ public class ProductCreator{
 				in = new BufferedReader(new FileReader(productData));
 				String line;
 				while ((line = in.readLine()) != null) {
-					addToProductMap(line);
+					String[] dataRow = line.split(",");
+					if(compilationToProductsMap.get(dataRow[0]) == null){		
+						compilationToProductsMap.put(dataRow[0], new HashMap<String,String>());
+					}
+		
+		compilationToProductsMap.get(dataRow[0]).put(dataRow[1], dataRow[2]);	
 				}
 					
 			} catch (FileNotFoundException ex) {
@@ -49,16 +54,6 @@ public class ProductCreator{
 		}
 	}
 	
-	public void addToProductMap(String line){
-		String[] dataRow = line.split(",");
-		if(compilationToProductsMap.get(dataRow[0]) == null){		
-			compilationToProductsMap.put(dataRow[0], new HashMap<String,String>());
-		}
-		
-		compilationToProductsMap.get(dataRow[0]).put(dataRow[1], dataRow[2]);
-		
-	}
-	
 	
 	
 	//FIND AND COPY FILES
@@ -68,7 +63,9 @@ public class ProductCreator{
 		try{
 			for(Map.Entry<String, String> entry : tempMap.entrySet()){
 				File foundFile = findFile(entry.getKey());
-				copyFile(foundFile.getPath());
+				//WHY IS ABOVE RETURNING NULL FILES?
+				if(foundFile != null) copyFile(foundFile, entry.getValue());
+				
 				//System.out.printf("Key : %s and Value: %s %n", entry.getKey(), entry.getValue());
 				
 			}
@@ -96,9 +93,11 @@ public class ProductCreator{
 		return foundFile;
 }
 	
-	public void copyFile(String sourceFileLocation) throws IOException {
-		File sourceFile = new File(sourceFileLocation);
-		File destinationFile = new File(targetDirectory + sourceFile.getName());
+	public void copyFile(File sourceFile, String newFilePrefix) throws IOException {
+		String sourceFileName = sourceFile.getName();
+		String targetFileNameNoPrefix = sourceFileName.substring(sourceFileName.indexOf(" "));
+		File destinationFile = new File(targetDirectory + newFilePrefix + targetFileNameNoPrefix);
+
 		try {
 			FileInputStream fileInputStream = new FileInputStream(sourceFile);
 			FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
